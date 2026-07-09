@@ -1,0 +1,154 @@
+#!/bin/bash
+# monitorek — zarządzanie monitorem zewnętrznym (Gigabyte G27QC)
+# Użycie: monitorek <komenda>
+
+DAEMON_LABEL="com.monitorek.daemon"
+DAEMON_PLIST="$HOME/Library/LaunchAgents/$DAEMON_LABEL.plist"
+DAEMON_BIN="$HOME/CascadeProjects/monitor-calibration/MonitorekDaemon"
+CONFIG="$HOME/Library/Application Support/MonitorekDaemon/config.json"
+LOG="$HOME/Library/Logs/monitorek-daemon.log"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+case "${1:-status}" in
+    status)
+        echo -e "${CYAN}=== MonitorekDaemon ===${NC}"
+        if launchctl list 2>/dev/null | grep -q "$DAEMON_LABEL"; then
+            PID=$(launchctl list | grep "$DAEMON_LABEL" | awk '{print $1}')
+            echo -e "  Daemon: ${GREEN}RUNNING${NC} (PID: $PID)"
+            if [ "$PID" != "-" ] && [ "$PID" != "0" ]; then
+                MEM=$(ps -o rss= -p "$PID" 2>/dev/null | awk '{printf "%.1f", $1/1024}')
+                CPU=$(ps -o %cpu= -p "$PID" 2>/dev/null | tr -d ' ')
+                echo -e "  CPU: ${CPU}%  RAM: ${MEM}MB"
+            fi
+        else
+            echo -e "  Daemon: ${RED}STOPPED${NC}"
+        fi
+        
+        echo -e "\n${CYAN}=== Jasność ===${NC}"
+        python3 -c "
+import ctypes
+ds = ctypes.cdll.LoadLibrary('/System/Library/PrivateFrameworks/DisplayServices.framework/DisplayServices')
+cg = ctypes.cdll.LoadLibrary('/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics')
+cg.CGGetActiveDisplayList.argtypes = [ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_uint32)]
+cg.CGGetActiveDisplayList.restype = ctypes.c_int32
+cg.CGDisplayIsBuiltin.argtypes = [ctypes.c_uint32]
+cg.CGDisplayIsBuiltin.restype = ctypes.c_int
+ds.DisplayServicesGetBrightness.argtypes = [ctypes.c_uint32, ctypes.POINTER(ctypes.c_float)]
+ds.DisplayServicesGetBrightness.restype = ctypes.c_int
+ids = (ctypes.c_uint32 * 10)()
+cnt = ctypes.c_uint32(0)
+cg.CGGetActiveDisplayList(10, ids, ctypes.byref(cnt))
+b = ctypes.c_float(0.0)
+for i in range(cnt.value):
+    d = ids[i]
+    bi = cg.CGDisplayIsBuiltin(d)
+    ds.DisplayServicesGetBrightness(d, ctypes.byref(b))
+    n = 'MacBook' if bi else 'monitorek'
+    mx = 500.0 if bi else 250.0
+    print(f'  {n}: {b.value:.0%} ({b.value*mx:.0f} nits)')
+" 2>/dev/null
+        
+        echo -e "\n${CYAN}=== Font Smoothing ===${NC}"
+        FS=$(defaults read -g AppleFontSmoothing 2>/dev/null)
+        echo -e "  Level: $FS (0=off, 1=light, 2=medium, 3=strong)"
+        ;;
+    
+    start)
+        echo -n "Starting MonitorekDaemon... "
+        launchctl load "$DAEMON_PLIST" 2>/dev/null
+        sleep 1
+        if launchctl list 2>/dev/null | grep -q "$DAEMON_LABEL"; then
+            echo -e "${GREEN}OK${NC}"
+        else
+            echo -e "${RED}FAILED${NC}"
+            tail -5 "$LOG" 2>/dev/null
+        fi
+        ;;
+    
+    stop)
+        echo -n "Stopping MonitorekDaemon... "
+        launchctl unload "$DAEMON_PLIST" 2>/dev/null
+        echo -e "${GREEN}OK${NC}"
+        ;;
+    
+    restart)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+    
+    log)
+        tail -${2:-30} "$LOG" 2>/dev/null
+        ;;
+    
+    logf)
+        tail -f "$LOG" 2>/dev/null
+        ;;
+    
+    font)
+        case "${2:-}" in
+            0|1|2|3)
+                defaults write -g AppleFontSmoothing -int "$2"
+                echo -e "Font smoothing: ${GREEN}$2${NC} (restart apps to apply)"
+                ;;
+            *)
+                echo "Użycie: monitorek font <0|1|2|3>"
+                echo "  0 = off, 1 = light, 2 = medium, 3 = strong (Retina-like)"
+                ;;
+        esac
+        ;;
+    
+    config)
+        ${EDITOR:-nano} "$CONFIG"
+        echo "Restart daemon: monitorek restart"
+        ;;
+    
+    install)
+        echo -e "${CYAN}Instalacja MonitorekDaemon...${NC}"
+        # Compile daemon
+        echo -n "  Kompilacja... "
+        swiftc "$HOME/CascadeProjects/monitor-calibration/MonitorekDaemon.swift" \
+            -framework CoreGraphics -framework Foundation \
+            -O -o "$DAEMON_BIN" 2>/dev/null && echo -e "${GREEN}OK${NC}" || echo -e "${RED}FAIL${NC}"
+        
+        # Symlinks
+        mkdir -p "$HOME/.local/bin"
+        ln -sf "$(cd "$(dirname "$0")" && pwd)/$(basename "$0")" "$HOME/.local/bin/monitorek"
+        
+        # Load daemon
+        launchctl unload "$DAEMON_PLIST" 2>/dev/null
+        launchctl load "$DAEMON_PLIST" 2>/dev/null
+        
+        sleep 1
+        echo -e "\n${GREEN}Instalacja zakończona!${NC}"
+        $0 status
+        ;;
+    
+    uninstall)
+        echo -e "${YELLOW}Odinstalowywanie MonitorekDaemon...${NC}"
+        launchctl unload "$DAEMON_PLIST" 2>/dev/null
+        rm -f "$DAEMON_PLIST"
+        rm -f "$HOME/.local/bin/monitorek"
+        echo -e "${GREEN}Odinstalowano.${NC}"
+        ;;
+    
+    *)
+        echo -e "${CYAN}monitorek${NC} — zarządzanie monitorem zewnętrznym"
+        echo ""
+        echo "Komendy:"
+        echo "  status    - Pokaż stan (domyślne)"
+        echo "  start     - Uruchom daemon"
+        echo "  stop      - Zatrzymaj daemon"
+        echo "  restart   - Restart daemon"
+        echo "  log [n]   - Pokaż ostatnie n linii logu (domyślnie 30)"
+        echo "  logf      - Podążaj za logiem (tail -f)"
+        echo "  font      - Zmień font smoothing (0/1/2/3)"
+        echo "  config    - Edytuj konfigurację"
+        echo "  uninstall - Odinstaluj daemon"
+        ;;
+esac
