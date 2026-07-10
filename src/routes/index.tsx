@@ -444,7 +444,7 @@ function Index() {
               </div>
               <div className="mt-10 flex gap-3">
                 <a href="#" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-border glass hover:border-primary hover:text-purple-metal hover:-translate-y-0.5 transition"><Instagram className="h-4 w-4" /></a>
-                <a href="#" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-border glass hover:border-primary hover:text-purple-metal hover:-translate-y-0.5 transition"><Facebook className="h-4 w-4" /></a>
+                <a href="https://www.facebook.com/profile.php?id=61591684987173" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-border glass hover:border-primary hover:text-purple-metal hover:-translate-y-0.5 transition"><Facebook className="h-4 w-4" /></a>
               </div>
             </div>
           </Reveal>
