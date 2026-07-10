@@ -54,7 +54,7 @@ const packages = [
   },
   {
     name: "Strefa Premium",
-    price: "450-500",
+    price: "450",
     tag: "Maksymalna ochrona i estetyka",
     features: [
       "Pełny pakiet Strefy STANDARD",
