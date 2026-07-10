@@ -103,6 +103,16 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
 }
 
 function Index() {
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+
+  const toggleAddon = (addonName: string) => {
+    setSelectedAddons(prev =>
+      prev.includes(addonName)
+        ? prev.filter(a => a !== addonName)
+        : [...prev, addonName]
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Ambient orbs */}
@@ -351,12 +361,17 @@ function Index() {
                     <div className="text-lg sm:text-xl font-semibold text-primary">{addon.price}</div>
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{addon.desc}</p>
-                  <a
-                    href="#kontakt"
-                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-purple-metal transition"
+                  <button
+                    type="button"
+                    onClick={() => toggleAddon(addon.name)}
+                    className={`mt-6 inline-flex items-center gap-2 text-sm font-semibold transition ${
+                      selectedAddons.includes(addon.name)
+                        ? "text-primary bg-primary/10 px-3 py-1.5 rounded-full"
+                        : "text-primary hover:text-purple-metal"
+                    }`}
                   >
-                    Dodaj do rezerwacji <ArrowRight className="h-4 w-4" />
-                  </a>
+                    {selectedAddons.includes(addon.name) ? "Dodano ✓" : "Dodaj do rezerwacji"} {selectedAddons.includes(addon.name) ? <Check className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+                  </button>
                 </div>
               </Reveal>
             ))}
@@ -450,7 +465,7 @@ function Index() {
           </Reveal>
 
           <Reveal delay={120}>
-            <ContactForm />
+            <ContactForm selectedAddons={selectedAddons} toggleAddon={toggleAddon} />
           </Reveal>
         </div>
       </section>
@@ -485,7 +500,7 @@ function Field({ label, placeholder, name, type = "text" }: { label: string; pla
   );
 }
 
-function ContactForm() {
+function ContactForm({ selectedAddons, toggleAddon }: { selectedAddons: string[]; toggleAddon: (name: string) => void }) {
   const [state, handleSubmit] = useForm("mvzjegzd");
 
   if (state.succeeded) {
@@ -524,6 +539,28 @@ function ContactForm() {
           <option>Strefa Premium</option>
           <option>Dodatki / konsultacja</option>
         </select>
+      </div>
+      <div>
+        <label className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">Wybrane dodatki</label>
+        <div className="space-y-2">
+          {selectedAddons.length === 0 ? (
+            <p className="text-sm text-muted-foreground italic">Brak wybranych dodatków</p>
+          ) : (
+            selectedAddons.map((addon) => (
+              <div key={addon} className="flex items-center justify-between rounded-lg bg-input/50 border border-border px-4 py-2">
+                <span className="text-sm text-foreground">{addon}</span>
+                <button
+                  type="button"
+                  onClick={() => toggleAddon(addon)}
+                  className="text-muted-foreground hover:text-destructive transition"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+        <input type="hidden" name="addons" value={selectedAddons.join(', ')} />
       </div>
       <div>
         <label className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">Wiadomość</label>
