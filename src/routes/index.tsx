@@ -347,7 +347,7 @@ function Index() {
               </p>
               <div className="mt-10 space-y-3 sm:space-y-4">
                 {[
-                  { Icon: Phone, label: "Telefon", value: "+48 797295306", href: "tel:+48797295306" },
+                  { Icon: Phone, label: "Telefon", value: "+48 797 295 306", href: "tel:+48797295306" },
                   { Icon: Mail, label: "E-mail", value: "kontakt@motospastrefa.com", href: "mailto:kontakt@motospastrefa.com" },
                   { Icon: MapPin, label: "Adres", value: "Pogórze, ul. Ludwika Mierosławskiego 9, 81-198" },
                 ].map(({ Icon, label, value, href }) => {
