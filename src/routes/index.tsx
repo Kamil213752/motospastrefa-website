@@ -69,7 +69,7 @@ const packages = [
 const addons = [
   {
     name: "Aplikacja twardego wosku Premium",
-    price: "150 zł",
+    price: "400 zł",
     desc: "Długotrwała ochrona lakieru, silny efekt hydrofobowy (zrzucanie wody) i łatwiejsze bieżące mycie."
   },
   {
@@ -79,7 +79,7 @@ const addons = [
   },
   {
     name: "Konserwacja uszczelek",
-    price: "50 zł",
+    price: "200 zł",
     desc: "Zabezpieczenie elementów gumowych profesjonalnym środkiem przed starzeniem, promieniowaniem UV oraz przymarzaniem zimą."
   },
 ];
