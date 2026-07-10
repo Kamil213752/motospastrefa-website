@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
 });
 
 const services = [
-  { icon: Droplets, title: "Mycie Detailingowe", desc: "Bezdotykowe mycie wstępne aktywną pianą, ręczne mycie na dwa wiadra, czyszczenie felg, osuszanie mikrofibry, mycie szyb, dressing opon.", img: washImg },
+  { icon: Droplets, title: "Mycie Detailingowe", desc: "Bezdotykowe mycie wstępne aktywną pianą, ręczne mycie na dwa wiadra, czyszczenie felg, osuszanie mikrofibrą, mycie szyb, dressing opon.", img: washImg },
   { icon: Sofa, title: "Detailing Wnętrza", desc: "Drobiazgowe odkurzanie kabiny i bagażnika, czyszczenie kokpitu i tworzyw, antystatyczny dressing wnętrza, czyszczenie progów i wnęk.", img: interiorImg },
   { icon: Shield, title: "Detailing Skór i Lakieru", desc: "Profesjonalne czyszczenie i impregnacja skór, nabłyszczanie lakieru wykończeniowe, maskowanie mikrorys, głęboki połysk.", img: polishImg },
   { icon: Wrench, title: "Dodatki Premium", desc: "Aplikacja twardego wosku, niewidzialna wycieraczka hydrofobowa, konserwacja uszczelek przed starzeniem.", img: polishImg },
@@ -32,7 +32,7 @@ const packages = [
       "Bezdotykowe mycie wstępne aktywną pianą",
       "Ręczne mycie detailingowe na dwa wiadra",
       "Czyszczenie felg dedykowaną chemią",
-      "Bezpieczne osuszanie mikrofibry",
+      "Bezpieczne osuszanie mikrofibrą",
       "Mycie szyb bezsmugowe",
       "Premium dressing opon (efekt hydrofobowy)"
     ],
