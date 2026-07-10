@@ -26,22 +26,61 @@ const services = [
 const packages = [
   {
     name: "Strefa Start",
-    price: "349",
-    tag: "Idealny na początek",
-    features: ["Mycie ręczne 2-wiadrowe", "Dekontaminacja lakieru", "Czyszczenie felg i opon", "Woskowanie w sprayu", "Mycie szyb bezsmugowe"],
+    price: "250",
+    tag: "Bezpieczna pielęgnacja podstawowa",
+    features: [
+      "Bezdotykowe mycie wstępne aktywną pianą",
+      "Ręczne mycie detailingowe na dwa wiadra",
+      "Czyszczenie felg dedykowaną chemią",
+      "Bezpieczne osuszanie mikrofibry",
+      "Mycie szyb bezsmugowe",
+      "Premium dressing opon (efekt hydrofobowy)"
+    ],
+  },
+  {
+    name: "Strefa Standard",
+    price: "350",
+    tag: "Pełny pakiet z detailingiem wnętrza",
+    featured: true,
+    features: [
+      "Pełny pakiet Strefy START",
+      "Drobiazgowe odkurzanie kabiny i bagażnika",
+      "Czyszczenie kokpitu i tworzyw",
+      "Antystatyczny dressing wnętrza (ochrona UV)",
+      "Czyszczenie progów i wnęk drzwiowych",
+      "Obustronne mycie szyb",
+      "Odświeżenie zapachu kabiny"
+    ],
   },
   {
     name: "Strefa Premium",
-    price: "899",
-    tag: "Najczęściej wybierany",
-    featured: true,
-    features: ["Wszystko ze Startu", "Odkurzanie wnętrza", "Czyszczenie plastików i skór", "Jednostopniowa korekta lakieru", "Powłoka polimerowa 6M", "Impregnacja tapicerki"],
+    price: "450-500",
+    tag: "Maksymalna ochrona i estetyka",
+    features: [
+      "Pełny pakiet Strefy STANDARD",
+      "Profesjonalne czyszczenie i impregnacja skór",
+      "Nabłyszczanie lakieru wykończeniowe",
+      "Maskowanie mikrorys",
+      "Głęboki połysk i ochrona koloru"
+    ],
+  },
+];
+
+const addons = [
+  {
+    name: "Aplikacja twardego wosku Premium",
+    price: "150 zł",
+    desc: "Długotrwała ochrona lakieru, silny efekt hydrofobowy (zrzucanie wody) i łatwiejsze bieżące mycie."
   },
   {
-    name: "Strefa Ceramic",
-    price: "2 499",
-    tag: "Ochrona na lata",
-    features: ["Pełny detailing zewnętrzny", "Wielostopniowa korekta lakieru", "Powłoka ceramiczna 5 lat", "Powłoka na felgi i szyby", "Pełny detailing wnętrza", "Dezynfekcja ozonem"],
+    name: "Niewidzialna wycieraczka",
+    price: "70 zł",
+    desc: "Nałożenie powłoki hydrofobowej na szybę czołową – poprawa widoczności w deszczu (odprowadzanie wody pędem powietrza)."
+  },
+  {
+    name: "Konserwacja uszczelek",
+    price: "50 zł",
+    desc: "Zabezpieczenie elementów gumowych profesjonalnym środkiem przed starzeniem, promieniowaniem UV oraz przymarzaniem zimą."
   },
 ];
 
@@ -291,6 +330,40 @@ function Index() {
         </div>
       </section>
 
+      {/* ADDONS */}
+      <section className="py-20 sm:py-28 lg:py-32 px-5 sm:px-6 bg-card/30">
+        <div className="max-w-7xl mx-auto">
+          <Reveal>
+            <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 lg:mb-20">
+              <div className="text-xs uppercase tracking-[0.35em] text-purple-metal font-semibold mb-4">🛠️ Strefa Dodatków</div>
+              <h2 className="font-display text-4xl sm:text-5xl md:text-6xl text-metal">ROZSZERZ SWÓJ PAKIET</h2>
+              <div className="mx-auto mt-6 h-px w-24 bg-gradient-to-r from-transparent via-primary to-transparent" />
+              <p className="mt-6 text-muted-foreground text-lg">Dodatkowe zabiegi dla jeszcze lepszych efektów.</p>
+            </div>
+          </Reveal>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {addons.map((addon, i) => (
+              <Reveal key={addon.name} delay={i * 100}>
+                <div className="relative rounded-2xl card-gradient-border shadow-card-premium p-6 transition-all duration-500 hover:-translate-y-2 hover:shadow-glow">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="font-display text-xl sm:text-2xl text-metal">{addon.name}</h3>
+                    <div className="text-lg sm:text-xl font-semibold text-primary">{addon.price}</div>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{addon.desc}</p>
+                  <a
+                    href="#kontakt"
+                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-purple-metal transition"
+                  >
+                    Dodaj do rezerwacji <ArrowRight className="h-4 w-4" />
+                  </a>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ABOUT */}
       <section id="o-nas" className="py-20 sm:py-28 lg:py-32 px-5 sm:px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 sm:gap-16 items-center">
@@ -447,9 +520,9 @@ function ContactForm() {
         <label className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">Wybrany pakiet</label>
         <select name="package" className="w-full rounded-lg bg-input/50 border border-border px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition">
           <option>Strefa Start</option>
+          <option>Strefa Standard</option>
           <option>Strefa Premium</option>
-          <option>Strefa Ceramic</option>
-          <option>Inny / konsultacja</option>
+          <option>Dodatki / konsultacja</option>
         </select>
       </div>
       <div>
