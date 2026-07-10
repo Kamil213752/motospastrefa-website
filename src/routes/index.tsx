@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useReveal } from "@/hooks/useReveal";
 import { useState, useEffect, type ReactNode } from "react";
+import { useForm, ValidationError } from "@formspree/react";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -347,7 +348,7 @@ function Index() {
               <div className="mt-10 space-y-3 sm:space-y-4">
                 {[
                   { Icon: Phone, label: "Telefon", value: "+48 500 600 700", href: "tel:+48500600700" },
-                  { Icon: Mail, label: "E-mail", value: "kontakt@motospastrefa.pl", href: "mailto:kontakt@motospastrefa.pl" },
+                  { Icon: Mail, label: "E-mail", value: "kontakt@motospastrefa.com", href: "mailto:kontakt@motospastrefa.com" },
                   { Icon: MapPin, label: "Adres", value: "Pogórze, ul. Ludwika Mierosławskiego 9, 81-198" },
                 ].map(({ Icon, label, value, href }) => {
                   const inner = (
@@ -376,30 +377,7 @@ function Index() {
           </Reveal>
 
           <Reveal delay={120}>
-            <form className="relative rounded-3xl card-gradient-border shadow-card-premium p-6 sm:p-8 space-y-5" onSubmit={(e) => e.preventDefault()}>
-              <h3 className="font-display text-2xl sm:text-3xl text-metal">FORMULARZ REZERWACJI</h3>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <Field label="Imię" placeholder="Jan" />
-                <Field label="Telefon" placeholder="+48 ..." />
-              </div>
-              <Field label="Model auta" placeholder="np. BMW M3" />
-              <div>
-                <label className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">Wybrany pakiet</label>
-                <select className="w-full rounded-lg bg-input/50 border border-border px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition">
-                  <option>Strefa Start</option>
-                  <option>Strefa Premium</option>
-                  <option>Strefa Ceramic</option>
-                  <option>Inny / konsultacja</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">Wiadomość</label>
-                <textarea rows={4} className="w-full rounded-lg bg-input/50 border border-border px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition resize-none" placeholder="Opisz stan auta i oczekiwania..." />
-              </div>
-              <button type="submit" className="w-full inline-flex items-center justify-center gap-2 rounded-full btn-premium shine px-6 py-4 font-semibold text-primary-foreground">
-                Wyślij zapytanie <ArrowRight className="h-4 w-4" />
-              </button>
-            </form>
+            <ContactForm />
           </Reveal>
         </div>
       </section>
@@ -420,15 +398,72 @@ function Index() {
   );
 }
 
-function Field({ label, placeholder }: { label: string; placeholder: string }) {
+function Field({ label, placeholder, name, type = "text" }: { label: string; placeholder: string; name: string; type?: string }) {
   return (
     <div>
       <label className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">{label}</label>
       <input
+        type={type}
+        name={name}
         placeholder={placeholder}
         className="w-full rounded-lg bg-input/50 border border-border px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
       />
     </div>
+  );
+}
+
+function ContactForm() {
+  const [state, handleSubmit] = useForm("mvzjegzd");
+
+  if (state.succeeded) {
+    return (
+      <div className="relative rounded-3xl card-gradient-border shadow-card-premium p-6 sm:p-8 text-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
+            <Check className="h-8 w-8 text-primary" />
+          </div>
+          <h3 className="font-display text-2xl sm:text-3xl text-metal">DZIĘKUJEMY!</h3>
+          <p className="text-muted-foreground">Twoje zapytanie zostało wysłane. Skontaktujemy się z Tobą wkrótce.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center justify-center gap-2 rounded-full btn-premium shine px-6 py-3 font-semibold text-primary-foreground"
+          >
+            Wyślij kolejne zapytanie
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="relative rounded-3xl card-gradient-border shadow-card-premium p-6 sm:p-8 space-y-5">
+      <h3 className="font-display text-2xl sm:text-3xl text-metal">FORMULARZ REZERWACJI</h3>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Field label="Imię" placeholder="Jan" name="name" />
+        <Field label="Telefon" placeholder="+48 ..." name="phone" type="tel" />
+      </div>
+      <Field label="Model auta" placeholder="np. BMW M3" name="car" />
+      <div>
+        <label className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">Wybrany pakiet</label>
+        <select name="package" className="w-full rounded-lg bg-input/50 border border-border px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition">
+          <option>Strefa Start</option>
+          <option>Strefa Premium</option>
+          <option>Strefa Ceramic</option>
+          <option>Inny / konsultacja</option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">Wiadomość</label>
+        <textarea name="message" rows={4} className="w-full rounded-lg bg-input/50 border border-border px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition resize-none" placeholder="Opisz stan auta i oczekiwania..." />
+        <ValidationError field="message" errors={state.errors} />
+      </div>
+      <button type="submit" disabled={state.submitting} className="w-full inline-flex items-center justify-center gap-2 rounded-full btn-premium shine px-6 py-4 font-semibold text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed">
+        {state.submitting ? "Wysyłanie..." : "Wyślij zapytanie"} <ArrowRight className="h-4 w-4" />
+      </button>
+      {state.errors && (
+        <div className="text-red-500 text-sm">Wystąpił błąd. Spróbuj ponownie.</div>
+      )}
+    </form>
   );
 }
 
